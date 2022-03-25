@@ -1,0 +1,40 @@
+#Ref https://gis.stackexchange.com/questions/394843/exporting-geometry-collection-as-shapefile-on-earth-engine
+
+#after drawing lines it will automatically import as variable geometry. Below code will export these as a shape file
+
+var fc = ee.FeatureCollection([geometry]);
+
+var features = fc.toList(fc.size());
+
+print(fc);
+
+print(fc.geometry().geometries());
+
+Map.addLayer(geometry);
+
+
+var polygons = features
+    .map(function (f) { 
+      return ee.Feature(f).set('geometry_type', ee.Feature(f).geometry().type()); })
+    .filter(ee.Filter.equals('geometry_type', 'Polygon'));
+
+polygons = ee.FeatureCollection(polygons);
+
+var lines = features
+    .map(function (f) { 
+      return ee.Feature(f).set('geometry_type', ee.Feature(f).geometry().type()); })
+    .filter(ee.Filter.equals('geometry_type', 'LineString'));
+
+lines = ee.FeatureCollection(lines);
+
+Export.table.toDrive({
+  collection: polygons,
+  description:'polygons',
+  fileFormat: 'SHP'
+});
+
+Export.table.toDrive({
+  collection: lines,
+  description:'lines',
+  fileFormat: 'SHP'
+});
