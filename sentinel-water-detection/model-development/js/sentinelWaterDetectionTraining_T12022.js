@@ -1,5 +1,5 @@
 var trainData = ee.FeatureCollection("projects/ee-epgalanis/assets/Final_data_9k"),
-    Region = 
+    Region =
     /* color: #d63000 */
     /* shown: false */
     ee.Geometry.Polygon(
@@ -20,7 +20,7 @@ var BANDS = ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'];
 var ic = Sentinel2A
       .filterDate('2019-01-01', '2019-12-01')
       .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 15));
-      
+
 Map.setCenter(143.96306, -37.74696, 12);
 
 
@@ -33,7 +33,19 @@ var classifier = ee.Classifier.smileCart().train(trainData, 'class', BANDS);
 var input = ic.median().select(BANDS);
 var classified = input.classify(classifier);
 
-print (classifier.confusionMatrix().accuracy());
+// print (classifier.confusionMatrix().accuracy());
+
+var trainAccuracy = classifier.confusionMatrix();
+
+
+print('      Confusion Matrix        ');
+print('------------------------------');
+print('                 True         ');
+print('                 Water   Land ');
+print('Predicted  Water ' + trainAccuracy.getInfo()[0][0] + '      ' + trainAccuracy.getInfo()[0][1]);
+print('           Land  ' + trainAccuracy.getInfo()[1][0] + '      ' + trainAccuracy.getInfo()[1][1]);
+print('------------------------------');
+
 
 var classifier_serialized = ee.Serializer.toJSON(classifier)
 
