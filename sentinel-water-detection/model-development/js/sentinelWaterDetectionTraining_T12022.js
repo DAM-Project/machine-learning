@@ -23,28 +23,53 @@ var ic = Sentinel2A
 
 Map.setCenter(143.96306, -37.74696, 12);
 
-
-// CART
-var classifier = ee.Classifier.smileCart().train(trainData, 'class', BANDS);
-
-
 // // print (classifier.explain());
 
 var input = ic.median().select(BANDS);
+
+var split = 0.7;  // Roughly 70% training, 30% testing.
+var samples = trainData.randomColumn('random');
+var training = samples.filter(ee.Filter.lt('random', split));
+var validation = samples.filter(ee.Filter.gte('random', split));
+
+
+// CART
+var classifier = ee.Classifier.smileCart().train(training, 'class', BANDS);
+
+
+print('Training size:', training.size());
+print('Test size:', validation.size());
+
+
 var classified = input.classify(classifier);
-
-// print (classifier.confusionMatrix().accuracy());
-
 var trainAccuracy = classifier.confusionMatrix();
 
 
-print('      Confusion Matrix        ');
-print('------------------------------');
+print(' Training Confusion Matrix   ');
 print('                 True         ');
 print('                 Water   Land ');
 print('Predicted  Water ' + trainAccuracy.getInfo()[0][0] + '      ' + trainAccuracy.getInfo()[0][1]);
 print('           Land  ' + trainAccuracy.getInfo()[1][0] + '      ' + trainAccuracy.getInfo()[1][1]);
+
 print('------------------------------');
+
+
+// Classify the validation data.
+var validated = validation.classify(classifier);
+// var testAccuracy = validated.confusionMatrix();
+var testAccuracy = validated.errorMatrix('class', 'classification');
+
+
+print('      Test Confusion Matrix   ');
+
+print('                 True         ');
+print('                 Water   Land ');
+print('Predicted  Water ' + testAccuracy.getInfo()[0][0] + '      ' + testAccuracy.getInfo()[0][1]);
+print('           Land  ' + testAccuracy.getInfo()[1][0] + '      ' + testAccuracy.getInfo()[1][1]);
+print('------------------------------');
+
+// Get a confusion matrix representing expected accuracy.
+print('Validation overall accuracy: ', testAccuracy.accuracy());
 
 
 var classifier_serialized = ee.Serializer.toJSON(classifier)
@@ -54,7 +79,7 @@ var classifier_serialized = ee.Serializer.toJSON(classifier)
 var dummy = ee.Feature(Region).set({'classifier': ee.String(classifier.explain().get('tree'))});
 
 
-Export.table.toAsset(ee.FeatureCollection(dummy), 'serialize-cart-classifier', 'cart_classifier_3')
+Export.table.toAsset(ee.FeatureCollection(dummy), 'serialize-cart-classifier', 'cart_classifier_3');
 
 
 var palette = [
@@ -62,4 +87,4 @@ var palette = [
   '0000FF', // Water
 ]
 
-Map.addLayer(classified.clip(Region), {palette: palette, min: 0, max: 2}, 'classification CART')
+Map.addLayer(classified.clip(Region), {palette: palette, min: 0, max: 2}, 'classification CART');
