@@ -34,7 +34,9 @@ var validation = samples.filter(ee.Filter.gte('random', split));
 
 
 // CART
-var classifier = ee.Classifier.smileCart().train(training, 'class', BANDS);
+// var classifier = ee.Classifier.smileCart().train(training, 'class', BANDS);
+//RandomForest
+var classifier = ee.Classifier.smileRandomForest(400).train(training, 'class', BANDS);
 
 
 print('Training size:', training.size());
