@@ -73,16 +73,15 @@ print('------------------------------');
 // Get a confusion matrix representing expected accuracy.
 print('Validation overall accuracy: ', testAccuracy.accuracy());
 
-
-var classifier_serialized = ee.Serializer.toJSON(classifier)
-
-
 // Here, we're using Region polygon as just a dummy feature
-var dummy = ee.Feature(Region).set({'classifier': ee.String(classifier.explain().get('tree'))});
+//var dummy = ee.Feature(Region).set({'classifier': ee.String(classifier.explain().get('tree'))});
+//Export.table.toAsset(ee.FeatureCollection(dummy), 'serialize-cart-classifier', 'cart_classifier_3');
 
+var dummy = ee.Serializer.toJSON(classifier)
 
-Export.table.toAsset(ee.FeatureCollection(dummy), 'serialize-cart-classifier', 'cart_classifier_3');
-
+Export.table.toAsset(ee.FeatureCollection(ee.Feature(Region).set({'classifier':dummy})),
+                    'serialize-randomforest-classifier',
+                    'randomforest_classifier_0');
 
 var palette = [
   'A52A2A', // Land
