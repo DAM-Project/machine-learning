@@ -2,28 +2,32 @@
 
 ```bash
 .
-├── final-data
+├── final-datasets-csv
+├── land-pixels
 ├── miscellaneous
-├── points
-├── polygons
+├── shapes
 └── README.md
 ```
 
-**final-data**
+**final-datasets-csv**
 
-This folder contains 3 files. Two of them are `train_data.csv` and `test_data.csv`. Finally, `Full_data.csv` is the collated dataset that contains **5460** rows, each having **4 bands - B2, B3, B4, B8**. Each of these rows correspond to one point on the map defined by the `.geo` column.
+This folder contains 2 files:
+
+"Final_data_5000m.csv" - csv file containing land pixel data, and water pixel data sampled from water bodies of 5000m squared or greater in area.
+
+"Final_data_9k.csv" - csv file containing the same land pixels as "Final_data_5000m.csv", but water bodies were sampled randomly.
+
+**land-pixels**
+
+This folder contains various files, all of which are csv files containing land pixels for different Victorian electorates
 
 **miscellaneous**
 
-This folder contains files generated from our research on SENTINEL-2 satellite dataset and running scripts to analyse it.
+This folder contains miscellaneous polygon files.
 
-**points**
+**shapes**
 
-Each of the files inside this folder contain extracted pixels values from the polygons (shape files). We have extracted 20 such pixel values for each of the polygons.
-
-**polygons**
-
-This folder contains polygons shape files for various LGAs in the Australia. The were created by drawing tool on the Google Earth Engine.
+This folder contains shape files with the extensions required to add them as a GEE asset.
 
 **README.md**
 
